@@ -89,3 +89,4 @@ __pycache__/
 *.pyd
 *.egg-info/
 .eggs/
+.venv
