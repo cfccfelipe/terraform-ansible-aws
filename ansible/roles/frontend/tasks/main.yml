@@ -1,0 +1,83 @@
+# # ─────────────────────────────────────────────
+# # Preparar usuario y directorio
+# # ─────────────────────────────────────────────
+- name: Ensure frontend user exists
+  user:
+    name: frontend
+    shell: /bin/bash
+    create_home: yes
+
+- name: Create frontend directory
+  file:
+    path: /opt/frontend
+    state: directory
+    owner: frontend
+    group: frontend
+    mode: '0755'
+
+# # ─────────────────────────────────────────────
+# # Clonar aplicación desde GitHub
+# # ─────────────────────────────────────────────
+- name: Clone frontend application from GitHub
+  git:
+    repo: 'https://github.com/juan-ruiz/movie-analyst-ui.git'
+    dest: /opt/frontend/movie-analyst-ui
+    version: master
+    force: yes
+  become: yes
+  become_user: frontend
+
+# # ─────────────────────────────────────────────
+# # Instalar dependencias Node.js
+# # ─────────────────────────────────────────────
+- name: Install Node.js dependencies
+  command: npm install --production
+  args:
+    chdir: /opt/frontend/movie-analyst-ui
+  become: yes
+  become_user: frontend
+# ─────────────────────────────────────────────
+# Crear servicio systemd
+# # ─────────────────────────────────────────────
+- name: Deploy systemd unit for frontend
+  template:
+    src: frontend.service.j2
+    dest: /etc/systemd/system/frontend.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Ensure frontend service is enabled and running
+  systemd:
+    name: frontend
+    state: started
+    enabled: yes
+
+## Instalar Nginx
+- name: Enable amazon-linux-extras nginx1
+  command: amazon-linux-extras enable nginx1
+
+- name: Install nginx
+  yum:
+    name: nginx
+    state: present
+
+# Configurar Nginx
+- name: Deploy Nginx site config
+  template:
+    src: frontend_nginx.conf.j2
+    dest: /etc/nginx/conf.d/frontend.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Test Nginx configuration
+  command: nginx -t
+
+- name: Reload Nginx
+  systemd:
+    name: nginx
+    state: reloaded

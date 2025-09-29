@@ -1,0 +1,18 @@
+[Unit]
+Description=Movie Analyst UI (Express/EJS)
+After=network.target
+
+[Service]
+Type=simple
+User=frontend
+WorkingDirectory=/opt/frontend/movie-analyst-ui
+ExecStart=/usr/bin/node server.js
+Restart=always
+
+# Variables de entorno
+Environment=PORT=3030
+Environment=NODE_ENV=production
+Environment=BACKEND_URL={{backend_url}}
+
+[Install]
+WantedBy=multi-user.target

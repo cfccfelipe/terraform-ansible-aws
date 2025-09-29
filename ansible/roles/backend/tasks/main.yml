@@ -1,0 +1,171 @@
+# # ─────────────────────────────────────────────
+# # Crear base de datos
+# # ─────────────────────────────────────────────
+- name: Ensure PyMySQL is installed for Ansible MySQL modules
+  ansible.builtin.pip:
+    name: PyMySQL
+    executable: pip3
+
+- name: Ensure movie_db database exists
+  community.mysql.mysql_db:
+    name: movie_db
+    state: present
+    login_host: "{{ rds_endpoint | default('localhost') }}"
+    login_user: "{{ db_user | default('applicationuser') }}"
+    login_password: "{{ db_password | default('applicationuser') }}"
+
+# # ─────────────────────────────────────────────
+# # Crear tablas necesarias
+# # ─────────────────────────────────────────────
+- name: Create publications table
+  community.mysql.mysql_query:
+    login_host: "{{ rds_endpoint }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    login_db: movie_db
+    query: |
+      CREATE TABLE IF NOT EXISTS publications (
+        name VARCHAR(255) PRIMARY KEY,
+        avatar VARCHAR(255) NOT NULL
+      );
+
+- name: Create reviewers table
+  community.mysql.mysql_query:
+    login_host: "{{ rds_endpoint }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    login_db: movie_db
+    query: |
+      CREATE TABLE IF NOT EXISTS reviewers (
+        name VARCHAR(255) PRIMARY KEY,
+        publication VARCHAR(255) NOT NULL,
+        avatar VARCHAR(255) NOT NULL,
+        FOREIGN KEY (publication) REFERENCES publications(name)
+      );
+
+- name: Create movies table
+  community.mysql.mysql_query:
+    login_host: "{{ rds_endpoint }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    login_db: movie_db
+    query: |
+      CREATE TABLE IF NOT EXISTS movies (
+        title VARCHAR(255) PRIMARY KEY,
+        release_year INT NOT NULL,
+        score INT NOT NULL,
+        reviewer VARCHAR(255) NOT NULL,
+        publication VARCHAR(255) NOT NULL,
+        FOREIGN KEY (reviewer) REFERENCES reviewers(name),
+        FOREIGN KEY (publication) REFERENCES publications(name)
+      );
+
+# # ─────────────────────────────────────────────
+# # Poblar datos iniciales
+# # ─────────────────────────────────────────────
+- name: Seed database with initial data
+  command: node seeds.js
+  args:
+    chdir: /opt/backend/movie-analyst-api
+  environment:
+    DB_HOST: "{{ rds_endpoint }}"
+    DB_USER: "{{ db_user }}"
+    DB_PASS: "{{ db_password }}"
+    DB_NAME: "{{ db_name }}"
+  become: yes
+  become_user: backend
+
+# # ─────────────────────────────────────────────
+# # Backend role – configuración de servicio
+# # ─────────────────────────────────────────────
+- name: Ensure backend user exists
+  user:
+    name: backend
+    shell: /bin/bash
+    create_home: yes
+
+- name: Create backend directory
+  file:
+    path: /opt/backend
+    state: directory
+    owner: backend
+    group: backend
+    mode: '0755'
+
+# # ─────────────────────────────────────────────
+# # Clonar aplicación desde GitHub
+# # ─────────────────────────────────────────────
+- name: Clone backend application from GitHub
+  git:
+    repo: 'https://github.com/aljoveza/devops-rampup.git'
+    dest: /opt/backend
+    version: master
+    force: yes
+  become: yes
+  become_user: backend
+
+- name: Ensure backend app ownership
+  file:
+    path: /opt/backend/movie-analyst-api
+    state: directory
+    owner: backend
+    group: backend
+    recurse: yes
+
+- name: Install Node.js dependencies for backend
+  npm:
+    path: /opt/backend/movie-analyst-api
+    production: true
+  become: yes
+  become_user: backend
+
+# ─────────────────────────────────────────────
+# Backend Node.js service (igual que ya tienes)
+# ─────────────────────────────────────────────
+- name: Deploy systemd unit for backend
+  template:
+    src: backend.service.j2
+    dest: /etc/systemd/system/backend.service
+    mode: '0644'
+
+- name: Reload systemd to pick up backend unit
+  command: systemctl daemon-reload
+
+- name: Ensure backend service is enabled and running
+  systemd:
+    name: backend
+    state: started
+    enabled: yes
+
+# # ─────────────────────────────────────────────
+# # Nginx reverse proxy para backend
+# # ─────────────────────────────────────────────
+
+- name: Enable amazon-linux-extras nginx1
+  command: amazon-linux-extras enable nginx1
+
+- name: Install Nginx
+  yum:
+    name: nginx
+    state: present
+
+- name: Ensure Nginx is enabled and running
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Deploy Nginx config for backend
+  template:
+    src: backend_nginx.conf.j2
+    dest: /etc/nginx/conf.d/backend.conf
+    mode: '0644'
+
+- name: Test Nginx configuration
+  command: nginx -t
+
+- name: Reload Nginx
+  systemd:
+    name: nginx
+    state: reloaded
+

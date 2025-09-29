@@ -1,0 +1,91 @@
+# ───────────────────────────────
+# Node.js / Frontend
+# ───────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+.pnpm-debug.log
+
+# Build / dist
+dist/
+build/
+.cache/
+.next/
+out/
+coverage/
+
+# ───────────────────────────────
+# Logs & temporales
+# ───────────────────────────────
+*.log
+*.tmp
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ───────────────────────────────
+# Systemd / runtime
+# ───────────────────────────────
+*.pid
+*.seed
+*.pid.lock
+
+# ───────────────────────────────
+# Terraform
+# ───────────────────────────────
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform
+
+# ───────────────────────────────
+# Ansible
+# ───────────────────────────────
+*.retry
+*.vault-pass
+*.vault_pass.txt
+
+# ───────────────────────────────
+# AWS / credenciales
+# ───────────────────────────────
+*.pem
+*.key
+*.crt
+*.csr
+*.der
+*.p12
+*.jks
+*.secrets
+*.env
+.env.*
+!.env.example
+
+# ───────────────────────────────
+# IDE / Editor
+# ───────────────────────────────
+.vscode/
+.idea/
+*.iml
+*.sublime-workspace
+*.sublime-project
+
+# ───────────────────────────────
+# Python
+# ───────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/

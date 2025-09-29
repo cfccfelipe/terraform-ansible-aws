@@ -1,0 +1,15 @@
+# Intérprete y configuración SSM
+ansible_connection: aws_ssm
+ansible_aws_ssm_bucket_name: ssm-transfer-qa-99009900
+ansible_aws_ssm_s3_addressing_style: virtual
+ansible_aws_region: us-east-1
+
+# Base de datos
+rds_endpoint: terraform-20250928221846591900000001.cedaeicu8hey.us-east-1.rds.amazonaws.com:3306
+rds_port: 3306
+db_user: admin
+db_name: movie_db
+db_password: securepass123
+
+# Backend
+backend_url: http://movie-alb-alb-480710464.us-east-1.elb.amazonaws.com/api

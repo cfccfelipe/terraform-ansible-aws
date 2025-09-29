@@ -1,0 +1,43 @@
+- name: Detect Linux distribution
+  shell: grep ^ID= /etc/os-release | cut -d= -f2
+  register: distro_info
+  changed_when: false
+  failed_when: distro_info.stdout is not defined or distro_info.stdout == ""
+
+- name: Install Ansible on Amazon Linux / RHEL / CentOS
+  package:
+    name: ansible
+    state: present
+  when: distro_info.stdout is defined and
+        distro_info.stdout in ["amzn", "centos", "rhel"]
+
+- name: Install Ansible on Ubuntu / Debian
+  apt:
+    name: ansible
+    state: present
+    update_cache: yes
+  when: distro_info.stdout is defined and
+        distro_info.stdout in ["ubuntu", "debian"]
+
+- name: Install AWS CLI on Amazon Linux / RHEL / CentOS
+  package:
+    name: awscli
+    state: present
+  when: distro_info.stdout is defined and
+        distro_info.stdout in ["amzn", "centos", "rhel"]
+
+- name: Install AWS CLI on Ubuntu / Debian
+  apt:
+    name: awscli
+    state: present
+    update_cache: yes
+  when: distro_info.stdout is defined and
+        distro_info.stdout in ["ubuntu", "debian"]
+
+- name: Ensure /opt/ansible directory exists
+  file:
+    path: /opt/ansible
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+    mode: '0755'

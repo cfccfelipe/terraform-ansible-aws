@@ -1,0 +1,16 @@
+[Unit]
+Description=Backend Node.js Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/node /opt/backend/movie-analyst-api/server.js
+Restart=always
+User=backend
+WorkingDirectory=/opt/backend/movie-analyst-api
+Environment=PORT=3000 DB_HOST={{ rds_endpoint | default("localhost") }} DB_USER={{ db_user | default("applicationuser") }} DB_PASS={{ db_password | default("applicationuser") }} DB_NAME={{ db_name | default("movie_db") }}
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=backend
+
+[Install]
+WantedBy=multi-user.target

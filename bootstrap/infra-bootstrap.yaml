@@ -1,0 +1,67 @@
+# 📦 infra-bootstrap.yaml – Terraform Remote State Resources (AWS)
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Bootstrap infrastructure for Terraform remote state backend (S3 + DynamoDB)
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: terraform-ansible-aws
+  Environment:
+    Type: String
+    Default: bootstrap-terraform
+  Owner:
+    Type: String
+    Default: felipe
+
+Resources:
+
+  TerraformStateBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: terraform-state-bucket-felipe-99009900
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      Tags:
+        - Key: Name
+          Value: terraform-state-bucket
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Owner
+          Value: !Ref Owner
+
+  TerraformLockTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: terraform-locks-felipe-99009900
+      AttributeDefinitions:
+        - AttributeName: LockID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: LockID
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      Tags:
+        - Key: Name
+          Value: terraform-lock-table
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Owner
+          Value: !Ref Owner
+
+Outputs:
+
+  BucketName:
+    Description: Name of the S3 bucket for Terraform state
+    Value: !Ref TerraformStateBucket
+
+  LockTableName:
+    Description: Name of the DynamoDB table for Terraform state locking
+    Value: !Ref TerraformLockTable

@@ -1,0 +1,92 @@
+{
+  "alb_dns_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "movie-alb-120079283.us-east-1.elb.amazonaws.com"
+  },
+  "alb_zone_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "Z35SXDOTRQ7X7K"
+  },
+  "ansible_aws_region": {
+    "sensitive": false,
+    "type": "string",
+    "value": "us-east-1"
+  },
+  "ansible_aws_ssm_bucket_endpoint_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://s3.us-east-1.amazonaws.com"
+  },
+  "ansible_aws_ssm_bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ssm-transfer-qa-99009900"
+  },
+  "ansible_backend_instance_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "i-0a4e1ead1c294d95b"
+  },
+  "ansible_bastion_instance_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "i-0d16265e82bd4a1f7"
+  },
+  "ansible_frontend_instance_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "i-01db4851fe161ac69"
+  },
+  "backend_private_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "10.0.102.248"
+  },
+  "bastion_private_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "10.0.1.148"
+  },
+  "bastion_public_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "44.222.236.69"
+  },
+  "db_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "terraform-20250928161431300700000002.cedaeicu8hey.us-east-1.rds.amazonaws.com:3306"
+  },
+  "db_port": {
+    "sensitive": false,
+    "type": "number",
+    "value": 3306
+  },
+  "ec2messages_endpoint_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpce-0b6726a57be3da1c7"
+  },
+  "frontend_private_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "10.0.101.174"
+  },
+  "ssm_endpoint_dns": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpce-0d5a8112929ee275f-br15hosl.ssm.us-east-1.vpce.amazonaws.com"
+  },
+  "ssm_endpoint_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpce-0d5a8112929ee275f"
+  },
+  "ssmmessages_endpoint_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpce-0d98f823cc0eac605"
+  }
+}
